@@ -1,11 +1,22 @@
 import random
-from fastapi import FastAPI, Query, Path, Body, Cookie, Header, Response
+from fastapi import (FastAPI,
+                    Query,
+                    Path,
+                    Body,
+                    Cookie,
+                    Header,
+                    Response,
+                    HTTPException
+)
 from pydantic import BaseModel, Field, AfterValidator, EmailStr
 from datetime import datetime, timezone, date
 from typing import Annotated, Literal
 from enum import StrEnum
 from uuid import UUID
+from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse, RedirectResponse
+
+from app.database import check_database_connection
 #Social Application Outline w/FastAPI
 
 # Start Server ->
@@ -54,7 +65,7 @@ def root():
 def health():
     return {"status": "ok"}
 
-@app.get("/users/")
+@app.get("/users")
 def get_all_users(
     pagination: Annotated[Pagination, Query()],
     filters: Annotated[Filters, Query()],
@@ -62,18 +73,24 @@ def get_all_users(
 ):
     return fake_users[pagination.offset: pagination.offset + pagination.limit]
 
-@app.get("/posts/")
+@app.get("/posts")
 def get_all_posts(skip: Annotated[int, Query(min_length=1, max_length=len(fake_posts))] = 0, limit: Annotated[int, Query(min_length=1, max_length=len(fake_posts))] = 10):
     if skip >= limit:
         raise ValueError("Skip Cannot be greater than or equal to limit")
     return fake_posts[skip: skip + limit]
 
-
-
-
-
+@app.get("/health/db")
+def get_db_health():
+    try:
+        connected = check_database_connection
+    except SQLAlchemyError:
+        raise HTTPException(status_code=503, detail="Database Unavailable")
+    if not connected:
+        raise HTTPException(status_code=503, detail="Detabase Check Failed")
+    return {"database": "connected"}
 
 #Examples
+"""
 @app.get("/items/")
 async def read_items(skip: int = 0, limit: int = 10):
     return fake_items[skip: skip + limit]
@@ -97,3 +114,4 @@ def read_item(item_id: int, q: str | None = None):
 @app.get("/files/{file_path:path}")
 async def read_file(file_path: str):
     return {"file_path": file_path}
+"""

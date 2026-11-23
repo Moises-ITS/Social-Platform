@@ -1,9 +1,11 @@
-## Start UV Server =>
+# Start UV Server =>
 
 uv run uvicorn app.main:app --reload
 
-# Start SQL Server =>
+## Start SQL Server =>
 
 docker compose up -d
 
-# npm install
+docker-compose down -v
+
+## npm install
