@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: socialdb
     ports:
-      - "127.0.0.1:5434:5434"
+      - "127.0.0.1:5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
