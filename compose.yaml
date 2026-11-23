@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: social
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: socialdb
+    ports:
+      - "127.0.0.1:5434:5434"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
