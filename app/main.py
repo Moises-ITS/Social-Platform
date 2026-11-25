@@ -17,10 +17,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.database import check_database_connection
-#Social Application Outline w/FastAPI
 
-# Start Server ->
-# uv run uvicorn app.main:app --reload
+#Workflow goes
+# HTTP Request -> Pydantic Validation -> SQLAlchemy Session -> PostgreSQL transaction -> HTTP Response
+
+#Social Application Outline w/FastAPIError
+
+#NOTE: Register /routers/users
 
 app = FastAPI(title="SocialAPI")
 
@@ -36,22 +39,6 @@ class Pagination(BaseModel):
 class Filters(BaseModel):
     order_by: Literal["created_at", "updated_at"] = "created_at"
     tags: set[str] = set()
-
-#make each user have a dict of posts
-#posts have list of comments + likes or dict
-#ect.
-class Post(BaseModel):
-    post_id: int
-    title: str
-    description: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class User(BaseModel):
-    user_id: int
-    username: str
-    email: EmailStr
-    hashed_password: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 fake_items = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
 fake_users = [{}]

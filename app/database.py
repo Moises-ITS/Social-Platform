@@ -12,17 +12,19 @@ from sqlalchemy import (
     MetaData,
 )
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import OperationalError
+
 from app.config import settings
 
 #compose.yaml -> "POSTGRES_USER:PASTGRES_PASSWORD@localhost:5432/POSTGRES_DB"
 DATABASE_URL = (
     "postgresql+psycopg://"
-    "social:devpassword@localhost:5432/socialdb"
+    "social:devpassword@localhost:5434/socialdb"
 )
 
 metadata_obj = MetaData()
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args={"connect_timeout": 5})
 
 class user_cols(TypedColumns):
     id: Named[int] = Column(primary_key=True)
@@ -41,13 +43,14 @@ typed_address_table = Table("address", metadata_obj, address_columns)
 
 Session = sessionmaker(
     bind=engine,
-    autoflush=False,
-    echo=False,
+    autoflush=True,
 )
 def check_database_connection() -> bool:
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT 1"))
-        return result.scalar_one() == 1
+    try:
+        with engine.connect() as conn:
+            return conn.execute(text("SELECT 1")).scalar_one() == 1
+    except OperationalError:
+        return False
 
 """
 with Session.begin() as session:

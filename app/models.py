@@ -1,8 +1,8 @@
 #How data is stored is PostgreSQL
 from sqlalchemy import Identity, String
-from sqlalchemy.orm import DeclaritiveBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-class Base(DeclaritiveBase):
+class Base(DeclarativeBase):
     pass
 
 class User(Base):
@@ -12,7 +12,6 @@ class User(Base):
         Identity(),
         primary_key=True
     )
-
     username: Mapped[str] = mapped_column(
         String(50),
         unique=True,
